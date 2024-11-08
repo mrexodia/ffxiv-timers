@@ -6,7 +6,12 @@
   export let eorzeaMinutes = 0;
 
   function updateTime() {
-    now = new Date();
+    // Only update time when the seconds change
+    const next = new Date();
+    if (next.getSeconds() != now.getSeconds()) {
+      return;
+    }
+    now = next;
 
     // https://github.com/violarulan/EorzeaTimeConvert/blob/5010d8e993b3754b35872d7b9b26cdee070403fc/convert.go#L29
     const EORZEA_TIME_CONSTANT = 3600.0 / 175.0;
@@ -16,6 +21,8 @@
 
     eorzeaHours = Math.floor(eorzeaSeconds / 3600) % 24;
     eorzeaMinutes = Math.floor((eorzeaSeconds % 3600) / 60);
+
+    // TODO: reorder and trigger schedule
   }
 
   setInterval(updateTime, 250);
@@ -29,24 +36,93 @@
     return `${pad02(hours)}:${pad02(minutes)}`;
   }
 
-  const timeCards = [
+  // https://ffxiv.consolegameswiki.com/wiki/GATEs
+  // https://www.xenoveritas.org/static/ffxiv/timer.html
+  const schedule = [
     {
-      time: "9:00 AM",
-      description: "Morning team standup meeting",
+      hour: -1,
+      minute: 0,
+      type: "GATE",
+      description: "Cliffhanger, Air Force One, Leap of Faith", // (The Falling City of Nym)
     },
     {
-      time: "11:30 AM",
-      description: "Client presentation for new project",
+      hour: -1,
+      minute: 20,
+      type: "GATE",
+      description: "Any Way the Wind Blows, The Slice is Right, Leap of Faith", // (The Fall of Belah'dia)
     },
     {
-      time: "2:15 PM",
-      description: "Design review session",
+      hour: -1,
+      minute: 40,
+      type: "GATE",
+      description: "The Slice is Right, Air Force One, Leap of Faith", // (Sylphstep)
     },
     {
-      time: "4:00 PM",
-      description: "Weekly progress update",
+      hour: 15,
+      minute: 0,
+      type: "Gold Saucer",
+      description: "Mini Cactpot Daily Reset",
     },
+    {
+      hour: 15,
+      minute: 0,
+      type: "Daily Reset",
+      description: "Allied Society Quests, Duty Roulette, Frontline",
+    },
+    {
+      hour: 20,
+      minute: 0,
+      type: "Grand Company",
+      description: "Mission Allowance Reset",
+    },
+    {
+      hour: 22,
+      minute: 0,
+      type: "Ocean Fishing",
+      description: "Ocean Fishing Voyage",
+    }
   ];
+
+  function getIcon(type) {
+    switch (type) {
+      case "GATE":
+        return "/GATE.png";
+      case "Gold Saucer":
+        return "/GoldSaucer.png";
+      case "Grand Company":
+        return "/GrandCompany.png";
+      case "Daily Reset":
+        return "/DailyReset.png";
+      default:
+        return null;
+    }
+  }
+
+  function getCard(scheduleItem) {
+    let card = { ...scheduleItem, icon: getIcon(scheduleItem.type) };
+    if (card.hour == -1) {
+      card.hour = now.getHours();
+      console.log(`minute: ${now.getMinutes()}, ${card.minute}`);
+      if (now.getMinutes() > card.minute + 8) {
+        card.hour += 1;
+      }
+    } else {
+      const utcDiff = now.getHours() - now.getUTCHours();
+      console.log;
+      card.hour += utcDiff;
+    }
+    return card;
+  }
+
+  function cardKey(card) {
+    // TODO: include the daily reset
+    return card.hour * 60 + card.minute + 8;
+  }
+
+  function reorder(cards) {
+    cards.sort((a, b) => cardKey(a) - cardKey(b));
+    return cards;
+  }
 </script>
 
 <main>
@@ -69,10 +145,16 @@
     </div>
   </header>
 
-  {#each timeCards as card}
+  {#each reorder(schedule.map(getCard)) as card}
     <div class="card">
-      <p class="time">{card.time}</p>
-      <p class="description">{card.description} {eorzeaHours}</p>
+      <div class="type">
+        {#if getIcon(card.type)}
+          <img src={getIcon(card.type)} alt={card.type} />
+        {/if}
+        {card.type}
+      </div>
+      <p class="time">{formatTime(card.hour, card.minute)}</p>
+      <p class="description">{card.description}</p>
     </div>
   {/each}
 </main>
@@ -102,6 +184,17 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  .type {
+    display: flex;
+    align-items: center;
+    gap: 0.2em;
+    min-height: 32px;
+  }
+
+  .type img {
+    height: 32px;
   }
 
   .label {
