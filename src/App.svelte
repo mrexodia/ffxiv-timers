@@ -6,9 +6,13 @@
   export let eorzeaMinutes = 0;
 
   function updateTime() {
-    // Only update time when the seconds change
+    // Update time when the seconds change
     const next = new Date();
-    if (next.getSeconds() != now.getSeconds()) {
+    if (
+      next.getSeconds() === now.getSeconds() &&
+      eorzeaHours !== 0 &&
+      eorzeaMinutes !== 0
+    ) {
       return;
     }
     now = next;
@@ -80,7 +84,7 @@
       minute: 0,
       type: "Ocean Fishing",
       description: "Ocean Fishing Voyage",
-    }
+    },
   ];
 
   function getIcon(type) {
