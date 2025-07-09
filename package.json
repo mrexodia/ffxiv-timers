@@ -1,5 +1,5 @@
 {
-  "name": "vite-svelte-starter",
+  "name": "ffxiv-timers",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^4.0.0",
-    "svelte": "^5.0.3",
-    "vite": "^5.4.9"
+    "@sveltejs/vite-plugin-svelte": "^5.1.0",
+    "svelte": "^5.35.5",
+    "vite": "^6.3.5"
   }
 }
