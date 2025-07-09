@@ -17,15 +17,14 @@ export default defineConfig({
         icons: [
           {
             src: "alarm-clock.svg",
-            sizes: "192x192",
+            sizes: "any",
             type: "image/svg+xml",
-          },
-          {
-            src: "alarm-clock.svg",
-            sizes: "512x512",
-            type: "image/svg+xml",
+            purpose: "any maskable"
           },
         ],
+        apple: {
+          statusBarStyle: "black",
+        }
       },
     }),
   ],
