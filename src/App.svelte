@@ -145,15 +145,16 @@
       const seconds = totalSeconds % 60;
       return `${minutes}m${pad02(seconds)}s left`;
     } else {
-      // For upcoming events, show time until event
-      const totalMinutes = Math.floor(milliseconds / (1000 * 60));
-      const hours = Math.floor(totalMinutes / 60);
-      const minutes = totalMinutes % 60;
+      // For upcoming events, show time until event WITH SECONDS (temporary for testing)
+      const totalSeconds = Math.floor(milliseconds / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
 
       if (hours > 0) {
-        return `${hours}h ${minutes}m`;
+        return `${hours}h ${minutes}m ${pad02(seconds)}s`;
       } else {
-        return `${minutes}m`;
+        return `${minutes}m ${pad02(seconds)}s`;
       }
     }
   }
